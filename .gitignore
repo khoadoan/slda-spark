@@ -9,10 +9,10 @@ code/bin
 RemoteSystemsTempFiles
 
 #Ignore hadoop generatd files
-etc/hadoop-local.sh
-etc/hadoop-cluster.sh
-etc/junit.sh
-etc/run.sh
+code/etc/hadoop-local.sh
+code/etc/hadoop-cluster.sh
+code/etc/junit.sh
+code/etc/run.sh
 
 #Do not ignore the following
-!ivy/local-repo/*.jar
+!code/ivy/local-repo/*.jar
