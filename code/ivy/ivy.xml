@@ -1,0 +1,32 @@
+<ivy-module version="2.0">
+  <info organisation="edu.umd" module="mapreduce-assignment" revision="${version}"/>
+
+  <publications>
+    <artifact type="pom" ext="pom" conf="default"/>
+    <artifact type="jar" ext="jar" conf="default"/>
+  </publications>
+
+  <dependencies>
+    <dependency org="org.apache.hadoop" name="hadoop-common" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-api" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-common" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-common" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-nodemanager" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-resourcemanager" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-hdfs" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-mapreduce-client-core" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-streaming" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
+    
+    <!-- <dependency org="org.apache.hadoop" name="hadoop-core" rev="1.0.3" conf="*->*,!sources,!javadoc" /> -->
+    
+    <dependency org="edu.umd" name="cloud9" rev="1.4.17" conf="*->*,!sources,!javadoc">
+      <exclude org="fastutil"/>
+      <exclude org="org.apache.hadoop"/>
+    </dependency>
+    <dependency org="junit" name="junit" rev="4.11" conf="*->*,!sources,!javadoc"/>
+    
+    <dependency name="hipi" rev="0.0.1" />
+    <dependency org="com.dropbox.core" name="dropbox-core-sdk" rev="1.7.7" />
+    
+  </dependencies>
+</ivy-module>

@@ -1,0 +1,18 @@
+### JAVA ###
+#Ignore java compiled files
+*.jar
+*.class
+
+#Ignore eclipse generated files
+.metadata
+code/bin
+RemoteSystemsTempFiles
+
+#Ignore hadoop generatd files
+etc/hadoop-local.sh
+etc/hadoop-cluster.sh
+etc/junit.sh
+etc/run.sh
+
+#Do not ignore the following
+!ivy/local-repo/*.jar
