@@ -1,8 +1,7 @@
 #Milestone 1 Report#
+*Khoa Doan*
 
-** Khoa Doan **
-
-*** I. The Problem ***
+## I. The Problem ##
 
 Large scale computer vision is recently being popular due to the emerging of large scale imagery data and in need of more generally trained visual models.  Image labeling has been investigated for decades, but the scale of the dataset is limited due to computational issues. However, the demand for large scale image labeling has become greater in recent years, simply because of the enormous amount of data that are generated everyday. Millions of satellite images are generated for every day and the task of understanding these data is never feasible for human to do exhaustively. The automatic way will benefit the community tremendously in different areas such as image retrieval, surveillance, city planning, national defense, etc. 
 
@@ -10,7 +9,7 @@ The increasing popularity of generic Big Data Frameworks such as Hadoop/MapReduc
 
 SLDA, however, uses Gibbs Sampling in solving its optimization problem. Gibbs Sampling, although expressing low bias, is difficult to parallelize in a Shared-Nothing architecture, such as Hadoop or Spark. Therefore, instead of using Gibbs Sampling, we propose a Variational Inference optimization alternative, which is more amenable to paralellization.
 
-*** II. The Literature ***
+## II. The Literature ##
 
 1. *Spatial Latent Dirichlet Allocation*
 
@@ -36,11 +35,11 @@ SLDA, however, uses Gibbs Sampling in solving its optimization problem. Gibbs Sa
     
     Image labeling is closely related to unsupervised feature space analysis. An important algorithm is called Mean-shift [2]. Mean-shift algorithm efficiently finds the modes of the data given the kernel function (or the metric of the data space) by shifting the location towards higher density regions. This algorithm has been widely applied in image segmentation and data clustering.
 
-*** III. Datasets ***
+## III. Datasets ##
 
 In our project, we use 2 different set of image data. To evaluate the performance of our proposed method, Spatial LDA using Variational inference, we use "Microsoft Common Objects in Context" dataset, which contain approximately 150,000 labeled images. To evaluate the processing performance (or scaling out) of our methods, we also use unlabeled images that were previously downloaded from Google Map using its API.
 
-*** IV. Dataset Analysis Preprocessing *** 
+## IV. Dataset Analysis Preprocessing ## 
 
 We combine the images in each dataset into bigger subset of images because small files (such as that of normal images) are efficient in a parallel environment such as MapReduce or Spark. Essentially, we index the images by a unique number and pack them into a set of sequence files, which is a key-value collection, where the key, in our case, is the index number of the image, and the value is its byte representation. 
 
@@ -49,7 +48,7 @@ Since image pixels do not by themselves represent interesting features and are t
 Due to the inherent high dimensionality of visual data, extracted features can be very noisy and thus are not representative for images. Feature quantization is introduced to group similar features into the same low level semantics. This process also allows us to better translate image data into words when we consider each group of similar semantic as a word. K-means clustering is one of the usual choices for quantization while it may suffer from either time or space problems in ordinary environment. 
 
 
-*** V. Engineering Contribution ***
+## V. Engineering Contribution ##
 
 We’ve created a Github repository for our project. Our repository currently contains:
 
@@ -59,6 +58,6 @@ We’ve created a Github repository for our project. Our repository currently co
     
 3. Codebook quantization: clustering feature vectors into similar semantic groups. We currently use K-means algorithm from the Apache Mahout library. 
 
-*** VI. Unit of Works ***
+## VI. Unit of Works ##
 
 Khoa Doan: Coded (1) and (3) in section **V**. I’m also deriving the variational inference for spatial latent dirichlet allocation.
