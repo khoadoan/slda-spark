@@ -22,6 +22,8 @@
     <dependency org="edu.umd" name="cloud9" rev="1.4.17" conf="*->*,!sources,!javadoc">
       <exclude org="fastutil"/>
       <exclude org="org.apache.hadoop"/>
+      <exclude org="opennlp"/>
+      <exclude org="spy"/>
     </dependency>
     <dependency org="junit" name="junit" rev="4.11" conf="*->*,!sources,!javadoc"/>
     
