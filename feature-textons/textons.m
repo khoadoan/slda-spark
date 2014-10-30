@@ -34,7 +34,7 @@ end
 
 fileID = fopen('filters.dat', 'wb+');
 for i = 1:length(filters)
-    fwrite(fileID, filters{i}, 'double');
+    fwrite(fileID, filters{i}, 'double', 0, 'b');
 end
 fclose(fileID);
 
@@ -48,8 +48,16 @@ fclose(fileID);
 rgbImage = imread('test.jpg');
 colorTransform = makecform('srgb2lab');
 labImage = applycform(rgbImage, colorTransform);
+labImage2 = RGB2Lab(rgbImage);
 figure(1); imshow(rgbImage);
 figure(2); imshow(labImage);
+A = reshape(labImage(7, 7, :), [1, 3])
+labImage2(:, :, 1) = labImage2(:, :, 1) / 100;
+labImage2(:, :, [2 3]) = (labImage2(:, :, [2 3]) + 128) / 256;
+figure(3); imagesc(labImage2);
+B = reshape(labImage2(7, 7, :), [1, 3])
+labImage = labImage2;
 
 %%
-resp1 = filter2(filters{1}, labImage(:, :, 1));
+resp1 = filter2(filters{1}, labImage(:, :, 2));
+resp1(1)
