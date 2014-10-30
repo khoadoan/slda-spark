@@ -37,3 +37,19 @@ for i = 1:length(filters)
     fwrite(fileID, filters{i}, 'double');
 end
 fclose(fileID);
+
+%% read output.dat
+fileID = fopen('output.dat', 'rb');
+sz = fread(fileID, 2, 'int32', 0, 'b');
+output = fread(fileID, [sz(2) sz(1)], 'double', 0, 'b');
+output = output';
+fclose(fileID);
+
+rgbImage = imread('test.jpg');
+colorTransform = makecform('srgb2lab');
+labImage = applycform(rgbImage, colorTransform);
+figure(1); imshow(rgbImage);
+figure(2); imshow(labImage);
+
+%%
+resp1 = filter2(filters{1}, labImage(:, :, 1));
