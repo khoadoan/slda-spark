@@ -17,7 +17,13 @@ import javax.imageio.ImageIO;
 
 public class Textons {
 
-	public static float lanswer = 0;
+	//public static float lanswer = 0;
+	static String filterFileName = "/home/ang/projects/slda/slda-spark/feature-textons/filters.dat";
+	static ArrayList<double[][]> filters = null;
+	
+	public static void loadFilters() throws IOException {
+		filters = readFilters(filterFileName);
+	}
 	
 	public static double[][] convolve(double[][] filter, float[][] data, int w, int h) {
 		double[][] response = new double[w][h];
@@ -73,7 +79,7 @@ public class Textons {
 		return new float[] {(float)L, (float)a, (float)b};
 	}
 	
-	public static double[][] filtering(BufferedImage img, ArrayList<double[][]> filters) {
+	public static double[][] filtering(BufferedImage img) {
 		int w = img.getWidth();
 		int h = img.getHeight();
 		float [][] colorR = new float[w][h];
@@ -96,9 +102,9 @@ public class Textons {
 				CIEA[x][y] = Lab[1];
 				CIEB[x][y] = Lab[2];
 			}
-		System.out.println("RGB(7, 7) = " + colorR[7][7] + ", " + colorG[7][7] + ", " + colorB[7][7]);
-		System.out.println("LAB(7, 7) = " + CIEL[7][7] + ", " + CIEA[7][7] + ", " + CIEB[7][7]);
-		lanswer = CIEL[7][7];
+		//System.out.println("RGB(7, 7) = " + colorR[7][7] + ", " + colorG[7][7] + ", " + colorB[7][7]);
+		//System.out.println("LAB(7, 7) = " + CIEL[7][7] + ", " + CIEA[7][7] + ", " + CIEB[7][7]);
+		//lanswer = CIEL[7][7];
 		// filtering
 		ArrayList<double[][]> responses = new ArrayList<double[][]>();
 		for (int i = 0; i < 3; ++ i) { // 9 responses
@@ -142,7 +148,7 @@ public class Textons {
 			}
 			filters.add(doubles);
 		}
-		System.out.println(filters.get(0)[7][7]);
+		System.out.println("filters[0][7][7] = " + filters.get(0)[7][7]);
 		return filters;
 	}
 

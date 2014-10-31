@@ -23,14 +23,13 @@ public class TextonsTest {
 		System.out.println(Arrays.toString(lab));
 
 		System.out.println("hehe");
-		String filterFileName = "/home/ang/projects/slda/slda-spark/feature-textons/filters.dat";
-		ArrayList<double[][]> filters = Textons.readFilters(filterFileName);
+		Textons.loadFilters();
 		BufferedImage img = null;
 		String imageFilename = "/home/ang/projects/slda/slda-spark/feature-textons/test.jpg";
 		img = ImageIO.read(new File(imageFilename));
 		String outputFileName = "/home/ang/projects/slda/slda-spark/feature-textons/output.png";
 		ImageIO.write(img, "png", new File(outputFileName));
-		double[][] response = Textons.filtering(img, filters);
+		double[][] response = Textons.filtering(img);
 		DataOutputStream os = new DataOutputStream(new FileOutputStream(
 				"/home/ang/projects/slda/slda-spark/feature-textons/output.dat"));
 		int w = img.getWidth();
