@@ -23,7 +23,9 @@ public class TextonsTest {
 		System.out.println(Arrays.toString(lab));
 
 		System.out.println("hehe");
-		Textons.loadFilters();
+
+		String filterFileName = "/home/ang/projects/slda/slda-spark/feature-textons/filters.dat";
+		Textons.loadFilters(filterFileName);
 		BufferedImage img = null;
 		String imageFilename = "/home/ang/projects/slda/slda-spark/feature-textons/test.jpg";
 		img = ImageIO.read(new File(imageFilename));

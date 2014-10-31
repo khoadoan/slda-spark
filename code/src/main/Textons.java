@@ -18,10 +18,9 @@ import javax.imageio.ImageIO;
 public class Textons {
 
 	//public static float lanswer = 0;
-	static String filterFileName = "/home/ang/projects/slda/slda-spark/feature-textons/filters.dat";
 	static ArrayList<double[][]> filters = null;
 	
-	public static void loadFilters() throws IOException {
+	public static void loadFilters(String filterFileName) throws IOException {
 		filters = readFilters(filterFileName);
 	}
 	
@@ -79,25 +78,15 @@ public class Textons {
 		return new float[] {(float)L, (float)a, (float)b};
 	}
 	
-	public static double[][] filtering(BufferedImage img) {
-		int w = img.getWidth();
-		int h = img.getHeight();
-		float [][] colorR = new float[w][h];
-		float [][] colorG = new float[w][h];
-		float [][] colorB = new float[w][h];
+	public static double[][] filtering(int w, int h, float[][] R, float[][] G, float[][] B) {
 		float [][] CIEL = new float[w][h];
 		float [][] CIEA = new float[w][h];
 		float [][] CIEB = new float[w][h];
 		for (int y = 0; y < h; ++ y)
 			for (int x = 0; x < w; ++ x) {
-				// get response for (x, y)
-				Color color = new Color(img.getRGB(x, y));
-				colorR[x][y] = color.getRed();
-				colorG[x][y] = color.getGreen();
-				colorB[x][y] = color.getBlue();
 //				float[] Lab = CIELab.getInstance().fromRGB(
 //						new float[]{colorR[x][y], colorG[x][y], colorB[x][y]});
-				float[] Lab = rgb2lab(new float[]{colorR[x][y], colorG[x][y], colorB[x][y]});
+				float[] Lab = rgb2lab(new float[]{R[x][y], G[x][y], B[x][y]});
 				CIEL[x][y] = Lab[0];
 				CIEA[x][y] = Lab[1];
 				CIEB[x][y] = Lab[2];
@@ -128,6 +117,23 @@ public class Textons {
 				}
 		// in total 17 responses
 		return response;
+	}
+	
+	public static double[][] filtering(BufferedImage img) {
+		int w = img.getWidth();
+		int h = img.getHeight();
+		float [][] colorR = new float[w][h];
+		float [][] colorG = new float[w][h];
+		float [][] colorB = new float[w][h];
+		for (int y = 0; y < h; ++ y)
+			for (int x = 0; x < w; ++ x) {
+				// get response for (x, y)
+				Color color = new Color(img.getRGB(x, y));
+				colorR[x][y] = color.getRed();
+				colorG[x][y] = color.getGreen();
+				colorB[x][y] = color.getBlue();
+			}
+		return filtering(w, h, colorR, colorG, colorB);
 	}
 	
 	public static ArrayList<double[][]> readFilters(String filename) throws IOException {
