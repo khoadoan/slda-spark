@@ -1,0 +1,286 @@
+\documentclass[]{article}
+\usepackage{amsmath}
+\usepackage{amsbsy}
+\usepackage{breqn}
+\usepackage[margin=0.5in]{geometry}
+
+\newcommand{\mbrack}[1]{\left\lbrack #1 \right\rbrack}
+\newcommand{\mbrace}[1]{\left\lbrace #1 \right\rbrace}
+\newcommand{\mparen}[1]{\left(#1\right)}
+
+%opening
+\title{Derivation of SLDA Variational Inference}
+\author{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Derivation of Variational Spatial LDA}
+
+Terminology
+\begin{itemize}
+	\item Bold $\boldsymbol{var}$ for observed variables
+\end{itemize}
+
+Variational Distribution
+\begin{eqnarray}
+q(\phi,\pi,d,z | \lambda,\gamma,\rho,\xi) &=& \prod\limits_{k=1}^{K}q(\phi_k|\lambda) \: \prod\limits_{m=1}^{M}q(\pi_m|\gamma) \: \prod\limits_{n=1}^{N}q(d_n | \rho) q(z_n | \xi)
+\end{eqnarray}
+where 
+\begin{itemize}
+	\item[$\phi_k \in R^V$] distribution over word of topic $k$
+	\item[$\pi_m \in R^K$] distribution over topics of document $m$
+	\item[$d_n \in R^M$] indicator vector where if $d_{nm} = 1$ means word $n$ belongs to document $m$
+	\item[$z_n \in R^K$] indicator vector where if $z_{nk} = 1$ means word $n$ is assigned to topic $k$
+\end{itemize}
+
+Lower bound of log likelihood:
+\begin{eqnarray}
+p(\boldsymbol{w}, \boldsymbol{c} | \alpha,\beta,\eta,\sigma) 
+&=& \log \int\limits_{\phi} \int\limits_{\pi} \sum\limits_{d} \sum\limits_{z} p(\phi,\pi,d,z,\boldsymbol{w},\boldsymbol{c} | \alpha,\beta,\eta,\sigma) \\
+&=&  \log \int\limits_{\phi} \int\limits_{\pi} \sum\limits_{d} \sum\limits_{z} q(\phi,\pi,d,z | \lambda,\gamma,\rho,\xi) \frac{p(\phi,\pi,d,z,\boldsymbol{c},\boldsymbol{w} | \alpha,\beta,\eta,\sigma)}{q(\phi,\pi,d,z | \lambda,\gamma,\rho,\xi)} \; \mathrm{d}\phi \: \mathrm{d}\pi \: \mathrm{d}d \: \mathrm{d}z\\
+&=& \log E_q \frac{p(\phi,\pi,d,z,\boldsymbol{c},\boldsymbol{w} | \alpha,\beta,\eta,\sigma)}{q(\phi,\pi,d,z | \lambda,\gamma,\rho,\xi)} \\
+&\ge& E_q \log p(\phi,\pi,d,z,\boldsymbol{c},\boldsymbol{w} | \alpha,\beta,\eta,\sigma) - E_q \log q(\phi,\pi,d,z | \lambda,\gamma,\rho,\xi) = L
+\end{eqnarray}
+where $E_q \equiv E_{q(\phi,\pi,d,z | \lambda,\gamma,\rho,\xi)}$
+
+Instead of maximizing $p$, we estimate it by maximizing the lower bound $L$
+
+\subsection*{First Term in $L$}
+
+\begin{eqnarray}
+E_q [\log p(\phi,\pi,d,z,\boldsymbol{c},\boldsymbol{w} | \alpha,\beta,\eta,\sigma)] &=& E_q [\log p(\phi|\beta) \: p(\pi|\alpha) \: p(d | \eta) \: p(\boldsymbol{c} | c^{\mathrm{d}}_d, \sigma) \: p(z | \pi_d) \: p(\boldsymbol{w} | \phi_d) \\
+&=& E_q [\log p(\phi|\beta)] + E_q [\log p(\pi|\alpha)] + E_q [\log p(d | \eta)] \\
+&+& E_q [\log p(\boldsymbol{c} | c^{\mathrm{d}}_d, \sigma)] + E_q[\log p(z | \pi_d)] + E_q [\log p(\boldsymbol{w} | \phi_z)] \\
+\end{eqnarray}
+
+For each sub-terms:
+
+\begin{eqnarray}
+E_q [\log p(\phi|\beta)] 
+&=& E_q \lbrack \log \prod\limits_{k=1}^{K} p(\phi_k | \beta) \rbrack \\
+&=& \sum\limits_{k=1}^{K} E_q \left\lbrack \log \Gamma \left( \sum\limits_{v=1}^{V} \beta_{v} \right) - \sum\limits_{v=1}^{V} \log \Gamma(\beta_{v}) + \sum\limits_{v=1}^{V} (\beta_{v}-1) \log(\phi_{kv}) \right\rbrack \\
+&=& \sum\limits_{k=1}^{K} \left\lbrack \log \Gamma(\sum\limits_{v=1}^{V} \beta_{v}) - \sum\limits_{v=1}^{V} \log \Gamma(\beta_{v}) + \sum\limits_{v=1}^{V} (\beta_{v}-1) (\Psi(\lambda_{kv}) - \Psi(\sum\limits_{v^'=1}^{V} \lambda_{kv^'})) \right\rbrack
+\end{eqnarray}
+
+\begin{eqnarray}
+E_q [\log p(\pi|\alpha)] 
+&=& E_q [\log \prod\limits_{m=1}^{M} p(\pi_m |  \alpha)] \\
+&=& \sum\limits_{m=1}^{M} E_q \log(p(\pi_m|\alpha)) \\
+&=& \sum\limits_{m=1}^{M} E_q \left\lbrack \log(\Gamma\mparen{\sum\limits_{k=1}^{K} \alpha_{k}}) - \sum\limits_{k=1}^{K} \log(\Gamma(\alpha_{k})) + \sum\limits_{k=1}^{K} (\alpha_{k}-1) \log(\pi_{mk}) \right\rbrack \\
+&=& \sum\limits_{m=1}^{M} \left\lbrack \log(\Gamma(\mparen{\sum\limits_{k=1}^{K} \alpha_{k}}) - \sum\limits_{k=1}^{K} \log(\Gamma(\alpha_{k})) + \sum\limits_{k=1}^{K} (\alpha_{k}-1) (\Psi(\gamma_{mk}) - \Psi(\sum\limits_{k'=1}^{K} \gamma_{mk'})) \right\rbrack\\
+\end{eqnarray}
+
+The following derivations skip some steps for the purpose of shorter writings.
+
+\begin{eqnarray}
+E_q [\log p(d | \eta)] 
+&=& \sum\limits_{n=1}^{N} E_q \log(p(d_n | \eta)) \\
+&=& \sum\limits_{n=1}^{N} E_q \left\lbrack \sum\limits_{m=1}^{M} d_{mn} \log(\eta) \right\rbrack\\
+&=& \sum\limits_{n=1}^{N} \sum\limits_{m=1}^{M} \rho_{mn} \log(\eta) \\
+\end{eqnarray}
+
+\textit{$c_{d_n}^{\mathrm{d}}$: location of document d (in its image)}.
+
+\begin{eqnarray}
+E_q [\log p(\boldsymbol{c} | c^{\mathrm{d}}_d, \sigma)] 
+&=& \sum\limits_{n=1}^{N} E_q \log p(c_n | c_{d_n}^{\mathrm{d}}) \\
+&=& \sum\limits_{n=1}^{N} E_q \left\lbrack \sum\limits_{m=1}^{M}  d_{mn} \log p(c_n | c_{d_{mn}}^{\mathrm{d}}) \right\rbrack \\
+&=& \sum\limits_{n=1}^{N} \sum\limits_{m=1}^{M} E_q [d_{mn} \log p(c_n | c_{d_{mn}}^{\mathrm{d}})]  \\
+&=& \sum\limits_{n=1}^{N} \sum\limits_{m=1}^{M} \rho_{mn} (\log \delta_{g_{d_{mn}}^{\mathrm{d}}} - \frac{(x_{d_{mn}}^{\mathrm{d}} - x_n)^2 + (y_{d_{mn}}^{\mathrm{d}} - y_n)^2}{\sigma^2})\\
+\end{eqnarray}
+
+\begin{eqnarray}
+E_q[\log p(z | \pi_d)]
+&=& \sum\limits_{n=1}^{N} E_q \left\lbrack \sum\limits_{m=1}^{M} \sum\limits_{k=1}^{K} d_{mn} z_{kn} \log(\pi_{mk}) \right\rbrack \\
+&=& \sum\limits_{n=1}^{N} \sum\limits_{m=1}^{M} \sum\limits_{k=1}^{K} E_q[d_{mn} z_{kn} \log(\pi_{mk})] \\
+&=& \sum\limits_{n=1}^{N} \sum\limits_{m=1}^{M} \sum\limits_{k=1}^{K} \rho_{mn} \xi_{kn} (\Psi(\gamma_{mk}) - \Psi(\sum\limits_{m'=1}^{M} \gamma_{m'k}))
+\end{eqnarray}
+
+\begin{eqnarray}
+E_q [\log p(\boldsymbol{w} | \phi_z)]
+&=& \sum\limits_{n}^{N} E_q \left\lbrack \sum\limits_{m}^{M} \sum\limits_{k}^{K} \sum\limits_{v}^{V} d_{mn} z_{kn} w^v_n log(\phi_{kv}) \right\rbrack \\
+&=& \sum\limits_{n}^{N} \sum\limits_{m}^{M} \sum\limits_{k}^{K} \sum\limits_{v}^{V} E_q[d_{mn} z_{kn} w^v_n log(\phi_{kv})] \\
+&=& \sum\limits_{n}^{N} \sum\limits_{m}^{M} \sum\limits_{k}^{K} \sum\limits_{v}^{V} \rho_{mn} \xi_{kn} w_n^v (\Psi(\lambda_{k\boldsymbol{v}}) - \Psi(\sum\limits_{k'}^{K} \lambda_{k'\boldsymbol{v}})) \\
+\end{eqnarray}
+
+\subsection*{The second term in $L$}
+
+This uses the log of the joint distribution under variational parameters in (1)
+
+\begin{eqnarray}
+E_q \log q(\phi | \lambda) 
+&=& \sum\limits_{k}^{K} E_q \log q(\phi_k | \lambda) \\
+&=& \sum\limits_{k}^{K} \mbrack{\log \Gamma(\sum\limits_{v}^{V} \lambda_{kv}) - \sum\limits_{v}^{V} \log(\Gamma(\lambda_{kv})) + \sum\limits_{v}^{V}(\lambda_{kv}-1) E_q[\log(\phi_{kv})]} \\
+&=& \sum\limits_{k}^{K} \left\lbrack \log \Gamma \mparen{\sum\limits_{v}^{V} \lambda_{kv}} - \sum\limits_{v}^{V} \log(\Gamma(\lambda_{kv})) + \sum\limits_{v}^{V}(\lambda_{kv}-1)(\Psi(\lambda_{kv}) - \Psi(\sum\limits_{v'}^{V} \lambda_{kv'}) \right\rbrack \\
+\end{eqnarray}
+
+\begin{eqnarray}
+E_q \log q(\pi | \gamma) 
+&=& \sum\limits_{m}^{M} E_q \log q(\pi_m | \gamma) \\
+&=& \sum\limits_{m}^{M} \mbrack{ \log \Gamma \mparen{ \sum\limits_{k}^{K} \gamma_{km}} - \sum\limits_{k}^{K} \log \Gamma(\gamma_{km}) + \sum\limits_{k}^{K}(\gamma_{km}-1)E_q[\log(\pi_{km})] } \\
+&=& \sum\limits_{m}^{M} \mbrack{ \log \Gamma\mparen{ \sum\limits_{k}^{K} \gamma_{km}} - \sum\limits_{k}^{K} \log \Gamma(\gamma_{km}) + \sum\limits_{k}^{K}(\gamma_{km}-1)(\Psi(\gamma_{km}) - \Psi(\sum\limits_{k'}^{K} \gamma_{k'm})) }\\
+\end{eqnarray}
+
+\begin{eqnarray}
+E_q \log q(d | \rho) 
+&=& \sum\limits_{n}^{N} E_q [\log p(d_n | \rho)] \\
+&=& \sum\limits_{n}^{N} \sum\limits_{m}^{M} E_q [d_{mn} \log(\rho_{mn})] \\
+&=& \sum\limits_{n}^{N} \sum\limits_{m}^{M} \rho_{mn} \log(\rho_{mn}) \\
+\end{eqnarray}
+
+\begin{eqnarray}
+E_q \log q(z | \xi) 
+&=& \sum\limits_{n}^{N} E_q \log q(z_n | \xi) \\
+&=& \sum\limits_{n}^{N} \sum\limits_{k}^{K} E_q [z_{kn} \log(\xi_{kn})] \\
+&=& \sum\limits_{n}^{N} \sum\limits_{k}^{K} \xi_{kn} \log(\xi_{kn})\\
+\end{eqnarray}
+
+\newpage
+
+\subsection*{Putting it all together}
+
+\begin{eqnarray}
+L 
+&=& \sum\limits_{k=1}^{K} \left\lbrack \log \Gamma(\sum\limits_{v=1}^{V} \beta_{v}) - \sum\limits_{v=1}^{V} \log \Gamma(\beta_{v}) + \sum\limits_{v=1}^{V} (\beta_{v}-1) (\Psi(\lambda_{kv}) - \Psi(\sum\limits_{v^'=1}^{V} \lambda_{kv^'})) \right\rbrack \\
+&+& \sum\limits_{m=1}^{M} \left\lbrack \log(\Gamma(\sum\limits_{k=1}^{K} \alpha_{k})) - \sum\limits_{k=1}^{K} \log(\Gamma(\alpha_{k})) + \sum\limits_{k=1}^{K} (\alpha_{k}-1) (\Psi(\gamma_{mk}) - \Psi(\sum\limits_{k'=1}^{K} \gamma_{mk'})) \right\rbrack \\
+&+& \sum\limits_{n=1}^{N} \sum\limits_{m=1}^{M} \rho_{mn} \log(\eta) \\
+&+& \sum\limits_{n=1}^{N} \sum\limits_{m=1}^{M} \rho_{mn} (\log \delta_{g_{d_{mn}}^{\mathrm{d}}} - \frac{(x_{d_{mn}}^{\mathrm{d}} - x_n)^2 + (y_{d_{mn}}^{\mathrm{d}} - y_n)^2}{\sigma^2}) \\
+&+& \sum\limits_{n=1}^{N} \sum\limits_{m=1}^{M} \sum\limits_{k=1}^{K} \rho_{mn} \xi_{kn} (\Psi(\gamma_{mk}) - \Psi(\sum\limits_{m'=1}^{M} \gamma_{m'k})) \\
+&+& \sum\limits_{n}^{N} \sum\limits_{m}^{M} \sum\limits_{k}^{K} \sum\limits_{v}^{V} \rho_{mn} \xi_{kn} w_n^v (\Psi(\lambda_{k\boldsymbol{v}}) - \Psi(\sum\limits_{k'}^{K} \lambda_{k'\boldsymbol{v}})) \\
+&-& \sum\limits_{k}^{K} \left\lbrack \log \Gamma \mparen{\sum\limits_{v}^{V} \lambda_{kv}} - \sum\limits_{v}^{V} \log(\Gamma(\lambda_{kv})) + \sum\limits_{v}^{V}(\lambda_{kv}-1)(\Psi(\lambda_{kv}) - \Psi(\sum\limits_{v'}^{V} \lambda_{kv'}) \right\rbrack \\
+&-& \sum\limits_{m}^{M} \mbrack{ \log \Gamma\mparen{ \sum\limits_{k}^{K} \gamma_{km}} - \sum\limits_{k}^{K} \log \Gamma(\gamma_{km}) + \sum\limits_{k}^{K}(\gamma_{km}-1)(\Psi(\gamma_{km}) - \Psi(\sum\limits_{k'}^{K} \gamma_{k'm})) }\\
+&-& \sum\limits_{n}^{N} \sum\limits_{m}^{M} \rho_{mn} \log(\rho_{mn}) \\
+&-& \sum\limits_{n}^{N} \sum\limits_{k}^{K} \xi_{kn} \log(\xi_{kn})\\
+\end{eqnarray}
+
+Maximize with respect to each term:
+
+\begin{eqnarray}
+L_{\rho_{mn}} 
+&=&\sum\limits_{n=1}^{N} \sum\limits_{m=1}^{M} \rho_{mn} \log(\eta) \\
+&+& \sum\limits_{n=1}^{N} \sum\limits_{m=1}^{M} \rho_{mn} (\log \delta_{g_{d_{mn}}^{\mathrm{d}}} - \frac{(x_{d_{mn}}^{\mathrm{d}} - x_n)^2 + (y_{d_{mn}}^{\mathrm{d}} - y_n)^2}{\sigma^2})\\
+&+& \sum\limits_{n=1}^{N} \sum\limits_{m=1}^{M} \sum\limits_{k=1}^{K} \rho_{mn} \xi_{kn} (\Psi(\gamma_{mk}) - \Psi(\sum\limits_{m'=1}^{M} \gamma_{m'k}) \\
+&+& \sum\limits_{n}^{N} \sum\limits_{m}^{M} \sum\limits_{k}^{K} \sum\limits_{v}^{V} \rho_{mn} \xi_{kn} w_n^v (\Psi(\lambda_{k\boldsymbol{v}}) - \Psi(\sum\limits_{k'}^{K} \lambda_{k'\boldsymbol{v}}) \\
+&-& \sum\limits_{n}^{N} \sum\limits_{m}^{M} \mbrack{\rho_{mn} \log(\rho_{mn})}
++ \lambda \mparen{\sum\limits_{m}^{M}\rho_{mn} - 1 }
+\end{eqnarray}
+
+\begin{eqnarray}
+\frac{\partial L}{\partial \rho_{mn}}
+&=& \log(\eta) \\
+&+& \log \delta_{g_{d_{mn}}^{\mathrm{d}}} - \frac{(x_{d_{mn}}^{\mathrm{d}} - x_n)^2 + (y_{d_{mn}}^{\mathrm{d}} - y_n)^2}{\sigma^2} \\
+&+& \sum\limits_{k=1}^{K} \xi_{kn} \left[ \Psi(\gamma_{mn}) - \Psi(\sum\limits_{m'=1}^{M} \gamma_{m'n}) \right] \\
+&+& \sum\limits_{k}^{K} \sum\limits_{v}^{V} \xi_{kn} w_n^v (\Psi(\lambda_{kv}) - \Psi(\sum\limits_{k'}^{K} \lambda_{k' \boldsymbol{v}}) \\
+&-& \log(\rho_{mn}) - 1 + \lambda \stackrel{set}{=} 0 \\
+\end{eqnarray}
+
+Solving yields:
+\[ \boxed{
+\rho_{mn} \propto \eta \delta_{g_{d_{mn}}^{\mathrm{d}}} \frac{\exp \mparen{\sum\limits_{k=1}^{K} \xi_{kn}\mbrack{\Psi(\gamma_{mn}) - \Psi\mparen{\sum\limits_{m'=1}^{M} \gamma_{m'n}}} + \sum\limits_{k}^{K} \sum\limits_{v}^{V} \mbrack{\xi_{kn} w_n^v \mparen{\Psi(\lambda_{kv}) - \Psi\mparen{\sum\limits_{k'}^{K} \lambda_{k' \boldsymbol{v}}}}} }}
+{\exp\mparen{\frac{(x_{d_{mn}}^{\mathrm{d}} - x_n)^2 + (y_{d_{mn}}^{\mathrm{d}} - y_n)^2}{\sigma^2}}}
+} \]
+
+\begin{eqnarray}
+L_{\xi_{kn}}
+&=& \sum\limits_{n=1}^{N} \sum\limits_{m=1}^{M} \sum\limits_{k=1}^{K} \rho_{mn} \xi_{kn} (\Psi(\gamma_{mk}) - \Psi(\sum\limits_{m'=1}^{M} \gamma_{m'k})) \\
+&+& \sum\limits_{n}^{N} \sum\limits_{m}^{M} \sum\limits_{k}^{K} \sum\limits_{v}^{V} \rho_{mn} \xi_{kn} w_n^v (\Psi(\lambda_{k\boldsymbol{v}}) - \Psi(\sum\limits_{k'}^{K} \lambda_{k'\boldsymbol{v}})) \\
+&-& \sum\limits_{n}^{N} \sum\limits_{k}^{K} \xi_{kn} \log(\xi_{kn}) + \lambda(\sum\limits_{k}^{K} \xi_{kn} - 1)\\
+\end{eqnarray}
+
+\begin{eqnarray}
+\frac{\partial L}{\partial \xi_{kn}}
+&=& \sum\limits_{m}^{M} \rho_{mn} \mparen{\Psi(\gamma_{mk}) - \Psi\mparen{\sum\limits_{m'=1}^{M} \gamma_{m'k}}} \\
+&+& \sum\limits_{m}^{M} \sum\limits_{v}^{V} \rho_{mn} w_n^v \mparen{\Psi(\lambda_{k\boldsymbol{v}}) - \Psi\mparen{\sum\limits_{k'}^{K} \lambda_{k'\boldsymbol{v}}}} \\  
+&-& \log(\xi_{kn}) - 1 + \lambda \stackrel{set}{=} 0
+\end{eqnarray}
+
+Similarly, solving yields:
+\[ \boxed{
+\xi_{kn} \propto \exp \mparen{\sum\limits_{m}^{M} \rho_{mn} \mparen{\Psi(\gamma_{mk}) - \Psi\mparen{\sum\limits_{m'=1}^{M} \gamma_{m'k}}} + \sum\limits_{m}^{M} \sum\limits_{v}^{V} \rho_{mn} w_n^v \mparen{\Psi(\lambda_{k\boldsymbol{v}}) - \Psi\mparen{\sum\limits_{k'}^{K} \lambda_{k'\boldsymbol{v}}}}}
+} \]
+
+\begin{eqnarray}
+L_{\gamma_{mk}}
+&=& \sum\limits_{m=1}^{M} \sum\limits_{k=1}^{K} (\alpha_{k}-1) \mparen{\Psi(\gamma_{mk}) - \Psi\mparen{\sum\limits_{k'=1}^{K} \gamma_{mk'}}}  \\
+&+& \sum\limits_{n=1}^{N} \sum\limits_{m=1}^{M} \sum\limits_{k=1}^{K} \rho_{mn} \xi_{kn} \mparen {\Psi(\gamma_{mk}) - \Psi \mparen{\sum\limits_{m'=1}^{M} \gamma_{m'k}}} \\
+&-& \sum\limits_{m}^{M} \mbrack{ \log \Gamma\mparen{ \sum\limits_{k}^{K} \gamma_{km}} - \sum\limits_{k}^{K} \log \Gamma(\gamma_{km}) + \sum\limits_{k}^{K}(\gamma_{km}-1)\mparen{\Psi(\gamma_{km}) - \Psi \mparen{\sum\limits_{k'}^{K} \gamma_{k'm}}}}\\
+&=& \sum\limits_{m=1}^{M} \sum\limits_{k=1}^{K} \mparen{\Psi(\gamma_{mk}) - \Psi\mparen{\sum\limits_{k'=1}^{K} \gamma_{mk'}}}  
+\mparen{ \alpha_{k} + \sum\limits_{n=1}^{N} \rho_{mn} \xi_{kn} - \gamma_{km} }\\
+&-& \sum\limits_{m}^{M} \log \Gamma \mparen{\sum\limits_{k}^{K} \gamma_{km}} + \sum\limits_{m}^{M} \sum\limits_{k}^{K} \log \Gamma(\gamma_{km}) \\
+\end{eqnarray}
+
+\begin{eqnarray}
+\frac{\partial L}{\partial \gamma_{mk}}
+&=& \Psi^\prime(\gamma_{mk}) (\alpha_{k} + \sum\limits_{n=1}^{N} \rho_{mn} \xi_{kn} - \gamma_{mk})  \\
+&-& \Psi^\prime\mparen{\sum\limits_{k'=1}^{K} \gamma_{mk'}} \sum\limits_{k'}^{K} (\alpha_{k'} + \sum\limits_{n=1}^{N} \rho_{mn} \xi_{k'n} - \gamma_{mk'}) \stackrel{set}{=} 0
+\end{eqnarray}
+
+Or:
+\begin{eqnarray}
+(\alpha_{mk} + \sum\limits_{n=1}^{N} \rho_{mn} \xi_{kn} - \gamma_{mk}) = \frac{\Psi^\prime\mparen{\sum\limits_{k'=1}^{K} \gamma_{mk'}}}{\Psi^\prime(\gamma_{mk})} \sum\limits_{k'}^{K} \mparen{\alpha_{k'} + \sum\limits_{n=1}^{N} \rho_{mn} \xi_{k'n} - \gamma_{mk'}}
+\end{eqnarray}
+
+Sum over k, yields:
+\begin{eqnarray}
+\sum_{k}^{K} \mparen{\alpha_{k} + \sum\limits_{n=1}^{N} \rho_{mn} \xi_{kn} - \gamma_{mk}} 
+= \mparen{\sum_{k}^{K} \frac{\Psi^\prime\mparen{\sum\limits_{k'=1}^{K} \gamma_{mk'}}}{\Psi^\prime(\gamma_{mk})}} \sum\limits_{k'}^{K} \mparen{\alpha_{k'} + \sum\limits_{n=1}^{N} \rho_{mn} \xi_{k'n} - \gamma_{mk'}}
+\end{eqnarray}
+
+Or
+
+\begin{eqnarray}
+\sum_{k}^{K} \mparen{\alpha_{k} + \sum\limits_{n=1}^{N} \rho_{mn} \xi_{kn} - \gamma_{mk}} = 0
+\end{eqnarray}
+
+Replacing it in ... yields:
+
+\[ \boxed{
+\gamma_{mk} = \alpha_{k} + \sum\limits_{n=1}^{N} \rho_{mn} \xi_{kn}
+} \]
+
+\begin{eqnarray}
+L_{\lambda_{kv}}
+&=& \sum\limits_{k=1}^{K} \left\lbrack \sum\limits_{v=1}^{V} (\beta_{v}-1) (\Psi(\lambda_{kv}) - \Psi(\sum\limits_{v^'=1}^{V} \lambda_{kv^'})) \right\rbrack \\
+&+& \sum\limits_{n}^{N} \sum\limits_{m}^{M} \sum\limits_{k}^{K} \sum\limits_{v}^{V} \rho_{mn} \xi_{kn} w_n^v (\Psi(\lambda_{k\boldsymbol{v}}) - \Psi(\sum\limits_{k'}^{K} \lambda_{k'\boldsymbol{v}})) \\
+&-& \sum\limits_{k}^{K} \left\lbrack \log \Gamma \mparen{\sum\limits_{v}^{V} \lambda_{kv}} - \sum\limits_{v}^{V} \log(\Gamma(\lambda_{kv})) + \sum\limits_{v}^{V}(\lambda_{kv}-1)(\Psi(\lambda_{kv}) - \Psi(\sum\limits_{v'}^{V} \lambda_{kv'}) \right\rbrack \\
+&=& \sum\limits_{k=1}^{K} \sum\limits_{v=1}^{V} \mparen{\Psi(\lambda_{kv}) - \Psi(\sum\limits_{v^'=1}^{V} \lambda_{kv^'})} \mparen{\beta_{v} + \sum\limits_{n}^{N} \sum\limits_{m}^{M} \rho_{mn} \xi_{kn} w_n^v - \lambda_{kv}} \\
+&-& \sum\limits_{k}^{K} \left\lbrace \log \Gamma(\sum\limits_{v}^{V} \lambda_{kv}) - \sum\limits_{v}^{V} \log(\Gamma(\lambda_{kv})) \right\rbrace
+\end{eqnarray}
+
+\begin{eqnarray}
+\frac{\partial L}{\partial \lambda_{kv}}
+&=& \Psi^\prime(\lambda_{kv})(\beta_{v} + \sum\limits_{n}^{N} \sum\limits_{m}^{M} \rho_{mn} \xi_{kn} w_n^v - \lambda_{kv}) \\
+&-&\Psi^\prime(\sum\limits_{v^'=1}^{V}\lambda_{kv'})\sum\limits_{v'}^{V} (\beta_{v'} + \sum\limits_{n}^{N} \sum\limits_{m}^{M} \rho_{mn} \xi_{kn} w_n^{v'} - \lambda_{kv'}) \stackrel{set}{=} 0
+\end{eqnarray}
+
+Similar to above, solving yields:
+
+\[ \boxed{
+\lambda_{kv} = \beta_{v} + \sum\limits_{n}^{N} \sum\limits_{m}^{M} \rho_{mn} \xi_{kn} w_n^v
+} \]
+
+\begin{eqnarray}
+L_{\beta_{v}}
+&=& \sum\limits_{k=1}^{K} \left\lbrack \log \Gamma(\sum\limits_{v=1}^{V} \beta_{v}) - \sum\limits_{v=1}^{V} \log \Gamma(\beta_{v}) + \sum\limits_{v=1}^{V} (\beta_{v}-1) (\Psi(\lambda_{kv}) - \Psi(\sum\limits_{v^'=1}^{V} \lambda_{kv^'})) \right\rbrack + \sum\limits_{k}^{K} \lambda_k \mparen{\sum\limits_{v}^{V} \beta_{v}-1} \\
+\end{eqnarray}
+
+\begin{eqnarray}
+L_{\alpha}
+&=& \sum\limits_{m=1}^{M} \left\lbrack \log(\Gamma(\sum\limits_{k=1}^{K} \alpha_{k})) - \sum\limits_{k=1}^{K} \log(\Gamma(\alpha_{k})) + \sum\limits_{k=1}^{K} (\alpha_{k}-1) (\Psi(\gamma_{mk}) - \Psi(\sum\limits_{k'=1}^{K} \gamma_{mk'})) \right\rbrack \\
+\end{eqnarray}
+
+\begin{eqnarray}
+\frac{\partial L}{\partial \alpha_i} 
+&=& M \mbrack{\Psi \mparen{\sum\limits_{k}^{K} \alpha_k} + \Psi\mparen{\alpha_i}} + \sum\limits_{m}^{M} \mbrack{ \Psi(\gamma_{mi}) - \Psi(\sum\limits_{k'=1}^{K} \gamma_{mk'})} 
+\end{eqnarray}
+
+Hessian: 
+\begin{eqnarray}
+\frac{\partial^2 L}{\partial \alpha_i \partial \alpha_j} 
+&=& M \mbrack{\Psi^\prime \mparen{\sum\limits_{k}^{K} \alpha_k} - I\mbrack{i=j} \Psi^\prime(\alpha_i)}
+\end{eqnarray}
+
+\end{document}
+
