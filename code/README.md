@@ -1,6 +1,21 @@
-To run the code, use typical command line for the assignments like
+### Preprocessing ###
 
-etc/hadoop-local.sh SmallFilesToSequenceFileConverter -input [small files directory] 
--output [output directory]. 
+1. We keep our images on Dropbox, and combine them into Sequence File, as described below:
 
-The output of the job is a big file which is all the small files combined in it.
+To run the Combine Task, run:
+
+```
+etc/hadoop-cluster.sh slda.processing.pack.DropboxImageDownloader -input [dropbox input locations] -output [output location] -reducers [number of reducers] -auth [auth file]
+```
+
+where:
+	- [dropbox input locations]: a file containing folders containing images  relative to root path of the dropbox account
+	- [output location]: HDFS output location of the sequence file
+	- [auth file]: authentication file for authentication into dropbox
+	- output: PairOfIntString(Folder Index, Filename) -> Image's byte array
+
+For example:
+
+```
+etc/hadoop-cluster.sh slda.processing.pack.DropboxImageDownloader -input /user/kdoan1/test.dbox.txt -output /user/kdoan1/slda/mscoco/eval/orig -reducers 41 -auth /user/kdoan1/dropbox.auth
+```

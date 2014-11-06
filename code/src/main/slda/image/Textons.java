@@ -1,3 +1,4 @@
+package slda.image;
 
 import java.awt.Color;
 

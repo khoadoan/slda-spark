@@ -7,28 +7,42 @@
   </publications>
 
   <dependencies>
-    <dependency org="org.apache.hadoop" name="hadoop-common" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-yarn-api" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-yarn-common" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-common" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-nodemanager" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-resourcemanager" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-hdfs" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-mapreduce-client-core" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-streaming" rev="2.3.0-cdh5.1.0" conf="*->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-common" rev="2.3.0-cdh5.1.0" />
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-api" rev="2.3.0-cdh5.1.0" />
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-common" rev="2.3.0-cdh5.1.0" />
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-common" rev="2.3.0-cdh5.1.0" />
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-nodemanager" rev="2.3.0-cdh5.1.0" />
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-resourcemanager" rev="2.3.0-cdh5.1.0" />
+    <dependency org="org.apache.hadoop" name="hadoop-hdfs" rev="2.3.0-cdh5.1.0" />
+    <dependency org="org.apache.hadoop" name="hadoop-mapreduce-client-core" rev="2.3.0-cdh5.1.0" />
+    <dependency org="org.apache.hadoop" name="hadoop-streaming" rev="2.3.0-cdh5.1.0" />
     
-    <!-- <dependency org="org.apache.hadoop" name="hadoop-core" rev="1.0.3" conf="*->*,!sources,!javadoc" /> -->
+    <!-- <dependency org="org.apache.hadoop" name="hadoop-core" rev="1.0.3"  /> -->
     
-    <dependency org="edu.umd" name="cloud9" rev="1.4.17" conf="*->*,!sources,!javadoc">
+    <dependency org="edu.umd" name="cloud9" rev="1.4.17">
       <exclude org="fastutil"/>
       <exclude org="org.apache.hadoop"/>
       <exclude org="opennlp"/>
       <exclude org="spy"/>
     </dependency>
-    <dependency org="junit" name="junit" rev="4.11" conf="*->*,!sources,!javadoc"/>
+    <dependency org="junit" name="junit" rev="4.11" />
     
-    <dependency name="hipi" rev="0.0.1" />
+    <!-- <dependency name="hipi" rev="0.0.1" /> -->
     <dependency org="com.dropbox.core" name="dropbox-core-sdk" rev="1.7.7" />
     
+<!--     <dependency org="org.apache.mahout" name="mahout-core" rev="0.9-cdh5.1.0" />
+    <dependency org="org.apache.mahout" name="mahout-math" rev="0.9-cdh5.1.0." />
+    <dependency org="org.apache.mahout" name="mahout-integration" rev="0.9-cdh5.1.0" /> -->
+    <dependency org="org.apache.mahout" name="mahout-core" rev="0.7-cdh4.5.0.3" conf="*->*,!javadoc,!sources">
+    	<exclude org="jfree"/>
+    </dependency>
+    <dependency org="org.apache.mahout" name="mahout-math" rev="0.7-cdh4.5.0.3." >
+    	<exclude org="jfree"/>
+    </dependency>
+    <dependency org="org.apache.mahout" name="mahout-integration" rev="0.7-cdh4.5.0.3" >
+    <exclude org="jfree"/>
+    </dependency>
+    <dependency org="jfree" name="jfreechart" rev="1.0.8a" />
+    <dependency org="com.amazonaws" name="aws-java-sdk" rev="1.8.3"  />
   </dependencies>
 </ivy-module>
