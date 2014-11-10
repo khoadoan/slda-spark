@@ -55,8 +55,6 @@ public class DropboxUploader {
             try {
                 DbxAuthInfo.Writer.writeToFile(authInfo, "/tmp/dropbox.auth");
                 System.out.println("Saved authorization information to \"" + argAuthFileOutput + "\".");
-                                
-                return;
             }
             catch (IOException ex) {
                 System.err.println("Error saving to <auth-file-out>: " + ex.getMessage());
