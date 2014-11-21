@@ -11,6 +11,15 @@ import org.junit.Test;
 
 public class SampleTest {
   @Test
+  public void test() {
+	  String s1 = "hello";
+	  String s2 = s1;
+	  String s3 = new String(s1);
+	  //s1 = "something else";
+	  System.out.println("dummy");
+  }
+	
+  @Test
   public void test1() throws Exception {
     assertEquals(1, Integer.parseInt("1"));
     assertTrue(1 < 2);

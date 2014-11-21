@@ -44,5 +44,11 @@
     </dependency>
     <dependency org="jfree" name="jfreechart" rev="1.0.8a" />
     <dependency org="com.amazonaws" name="aws-java-sdk" rev="1.8.3"  />
+    
+    <dependency org="org.apache.spark" name="spark-core_2.10" rev="1.0.0-cdh5.1.0">
+    	<exclude org="org.eclipse.jetty.orbit" />
+    </dependency>
+    <!-- <dependency org="org.eclipse.jetty.orbit" name="javax.transaction" rev="1.1.1.v201105210645" /> -->
+
   </dependencies>
 </ivy-module>

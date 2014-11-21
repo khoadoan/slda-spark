@@ -1,3 +1,4 @@
+package slda.processing.features;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -28,7 +29,6 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.mahout.clustering.Cluster;
-import org.apache.mahout.clustering.classify.WeightedPropertyVectorWritable;
 import org.apache.mahout.clustering.classify.WeightedVectorWritable;
 import org.apache.mahout.clustering.conversion.InputDriver;
 import org.apache.mahout.clustering.iterator.ClusterWritable;
@@ -49,8 +49,8 @@ import org.slf4j.LoggerFactory;
 
 import cern.colt.Arrays;
 
-public class BuildCodebook extends Configured implements Tool {
-  private static final Logger LOG = LoggerFactory.getLogger(BuildCodebook.class);
+public class BuildCodebookMahout extends Configured implements Tool {
+  private static final Logger LOG = LoggerFactory.getLogger(BuildCodebookMahout.class);
 
   public void TransformVectorsToSequence(Configuration conf, String inputPath, String outputPath)
       throws IOException {
@@ -251,7 +251,7 @@ public class BuildCodebook extends Configured implements Tool {
   /**
    * Creates an instance of this tool.
    */
-  public BuildCodebook() {
+  public BuildCodebookMahout() {
   }
 
   private static final String INPUT = "input";
@@ -312,7 +312,7 @@ public class BuildCodebook extends Configured implements Tool {
     String clusterPath = cmdline.hasOption(CLUSTER) ? cmdline.getOptionValue(CLUSTER) : "";
     int maxIterations = cmdline.hasOption(MAXITER) ? Integer.parseInt(cmdline.getOptionValue(MAXITER)) : 100;
 
-    LOG.info("Tool: " + BuildCodebook.class.getSimpleName());
+    LOG.info("Tool: " + BuildCodebookMahout.class.getSimpleName());
 
     Configuration conf = getConf();
 
@@ -344,6 +344,6 @@ public class BuildCodebook extends Configured implements Tool {
    * Dispatches command-line arguments to the tool via the {@code ToolRunner}.
    */
   public static void main(String[] args) throws Exception {
-    ToolRunner.run(new BuildCodebook(), args);
+    ToolRunner.run(new BuildCodebookMahout(), args);
   }
 }
