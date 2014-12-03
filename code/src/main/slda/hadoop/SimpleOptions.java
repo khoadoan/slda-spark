@@ -84,4 +84,8 @@ public class SimpleOptions {
 		}
 		return allOpts;
 	}
+	
+	public String[] getOptionValues(String option) {
+		return cmdline.getOptionValues(option);
+	}
 }
