@@ -1,4 +1,4 @@
-package lda.hadoop.inference;
+package slda.hadoop.inference;
 
 import java.io.IOException;
 import java.util.Iterator;

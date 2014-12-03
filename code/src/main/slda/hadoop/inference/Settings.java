@@ -1,4 +1,4 @@
-package lda.hadoop.inference;
+package slda.hadoop.inference;
 
 public interface Settings {
   // common settings
@@ -57,23 +57,4 @@ public interface Settings {
    * sub-interface must override this property
    */
   static final String PROPERTY_PREFIX = Settings.class.getPackage() + "" + DOT;
-
-  // public static void exportSettings(SequenceFile.Writer sequenceFileWriter) {
-  //
-  // conf.setFloat(Settings.PROPERTY_PREFIX + "model.mapper.converge.iteration",
-  // Settings.MAXIMUM_GAMMA_ITERATION);
-  //
-  // conf.setInt(Settings.PROPERTY_PREFIX + "model.topics", numberOfTopics);
-  // conf.setInt(Settings.PROPERTY_PREFIX + "corpus.terms", numberOfTerms);
-  // conf.setBoolean(Settings.PROPERTY_PREFIX + "model.train", training);
-  // conf.setBoolean(Settings.PROPERTY_PREFIX + "model.random.start", randomStartGamma);
-  // conf.setBoolean(Settings.PROPERTY_PREFIX + "model.informed.prior", informedPrior != null);
-  // conf.setBoolean(Settings.PROPERTY_PREFIX + "model.mapper.combiner", mapperCombiner);
-  // conf.setBoolean(Settings.PROPERTY_PREFIX + "model.truncate.beta", truncateBeta
-  // && iterationCount >= 10);
-  //
-  // conf.setInt("mapred.task.timeout", Settings.DEFAULT_MAPRED_TASK_TIMEOUT);
-  // conf.set("mapred.child.java.opts", "-Xmx2048m");
-  //
-  // }
 }

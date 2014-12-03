@@ -1,4 +1,4 @@
-package lda.hadoop.inference;
+package slda.hadoop.inference;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,6 +33,10 @@ import com.google.common.base.Preconditions;
 import edu.umd.cloud9.io.array.ArrayListOfIntsWritable;
 import edu.umd.cloud9.util.map.HMapIV;
 
+/**
+ * @author Khoa
+ *
+ */
 public class InformedPrior extends Configured implements Tool {
   static final Logger sLogger = Logger.getLogger(InformedPrior.class);
 
@@ -52,8 +56,6 @@ public class InformedPrior extends Configured implements Tool {
         .withDescription("input file").create(Settings.INPUT_OPTION));
     options.addOption(OptionBuilder.withArgName(Settings.PATH_INDICATOR).hasArg()
         .withDescription("output file").create(Settings.OUTPUT_OPTION));
-    options.addOption(OptionBuilder.withArgName(Settings.PATH_INDICATOR).hasArg()
-        .withDescription("term index file").create(ParseCorpus.INDEX));
 
     String termIndex = null;
     String output = null;
@@ -86,12 +88,6 @@ public class InformedPrior extends Configured implements Tool {
             + " not initialized...");
       }
 
-      if (line.hasOption(ParseCorpus.INDEX)) {
-        termIndex = line.getOptionValue(ParseCorpus.INDEX);
-      } else {
-        throw new ParseException("Parsing failed due to " + ParseCorpus.INDEX
-            + " not initialized...");
-      }
     } catch (ParseException pe) {
       System.err.println(pe.getMessage());
       formatter.printHelp(InformedPrior.class.getName(), options);
@@ -139,8 +135,6 @@ public class InformedPrior extends Configured implements Tool {
   public static void exportTerms(BufferedReader bufferedReader,
       SequenceFile.Reader sequenceFileReader, SequenceFile.Writer sequenceFileWriter)
       throws IOException {
-    Map<String, Integer> termIndex = ParseCorpus.importParameter(sequenceFileReader);
-
     IntWritable intWritable = new IntWritable();
     ArrayListOfIntsWritable arrayListOfIntsWritable = new ArrayListOfIntsWritable();
 
@@ -157,11 +151,6 @@ public class InformedPrior extends Configured implements Tool {
       stk = new StringTokenizer(line);
       while (stk.hasMoreTokens()) {
         temp = stk.nextToken();
-        if (termIndex.containsKey(temp)) {
-          arrayListOfIntsWritable.add(termIndex.get(temp));
-        } else {
-          sLogger.info("How embarrassing! Term " + temp + " not found in the index file...");
-        }
       }
 
       sequenceFileWriter.append(intWritable, arrayListOfIntsWritable);

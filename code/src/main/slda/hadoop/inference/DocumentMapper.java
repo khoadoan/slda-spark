@@ -1,9 +1,7 @@
-package lda.hadoop.inference;
+package slda.hadoop.inference;
 
 import java.io.IOException;
 import java.util.Iterator;
-
-import lda.hadoop.inference.VariationalInference.ParameterCounter;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
@@ -16,6 +14,8 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 
+import slda.hadoop.inference.VariationalInference.ParameterCounter;
+
 import com.google.common.base.Preconditions;
 
 import edu.umd.cloud9.io.array.ArrayListOfDoublesWritable;
@@ -25,7 +25,6 @@ import edu.umd.cloud9.io.pair.PairOfIntFloat;
 import edu.umd.cloud9.io.pair.PairOfInts;
 import edu.umd.cloud9.math.Gamma;
 import edu.umd.cloud9.math.LogMath;
-import edu.umd.cloud9.util.map.HMapII;
 import edu.umd.cloud9.util.map.HMapIV;
 
 @SuppressWarnings({"rawtypes", "unchecked", "deprecation"})
@@ -193,7 +192,7 @@ public class DocumentMapper extends Mapper<IntWritable, Document, PairOfInts, Do
     // boolean keepGoing = true;
     // be careful when adjust this initial value
     int gammaUpdateIterationCount = 1;
-    HMapII content = value.getContent();
+    int[] content = value.getContent();
 
     outputPhiTable.clear();
     do {
@@ -205,9 +204,7 @@ public class DocumentMapper extends Mapper<IntWritable, Document, PairOfInts, Do
       }
 
       // TODO: add in null check for content
-      itr = content.keySet().iterator();
-      while (itr.hasNext()) {
-        int termID = itr.next();
+      for(int termID: content) {
         // acquire the corresponding beta vector for this term
         if (phiTable.containsKey(termID)) {
           // reuse existing object
@@ -225,10 +222,10 @@ public class DocumentMapper extends Mapper<IntWritable, Document, PairOfInts, Do
             outputPhiTable.put(termID, new ArrayListOfDoublesWritable(outputPhi));
         }
 
-        int termCounts = content.get(termID);
+        int termCount = value.getTermCount(termID);
         tempBeta = retrieveBeta(numberOfTopics, beta, termID, numberOfTerms);
 
-        likelihoodPhi += updatePhi(numberOfTopics, termCounts, tempBeta, tempGamma, phi, outputPhi,
+        likelihoodPhi += updatePhi(numberOfTopics, termCount, tempBeta, tempGamma, phi, outputPhi,
             updateGamma);
         
         
@@ -292,9 +289,7 @@ public class DocumentMapper extends Mapper<IntWritable, Document, PairOfInts, Do
           }
         }
 
-        itr = content.keySet().iterator();
-        while (itr.hasNext()) {
-          int termID = itr.next();
+        for(int termID: content) {
           if (termID < 10000) {
             if (totalPhi.containsKey(termID)) {
               phi = phiTable.get(termID);
@@ -323,9 +318,7 @@ public class DocumentMapper extends Mapper<IntWritable, Document, PairOfInts, Do
       }
     } else {
       if (learning) {
-        itr = content.keySet().iterator();
-        while (itr.hasNext()) {
-          int termID = itr.next();
+        for(int termID: content) {
           // only get the phi's in of current document
           phi = phiTable.get(termID);
           for (int i = 0; i < numberOfTopics; i++) {

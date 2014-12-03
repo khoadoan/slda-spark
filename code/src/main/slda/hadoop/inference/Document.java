@@ -1,4 +1,4 @@
-package slda.spark.inference;
+package slda.hadoop.inference;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -8,13 +8,18 @@ import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Iterator;
 
 import org.apache.hadoop.io.Writable;
 
 import edu.umd.cloud9.util.map.HMapII;
-import edu.umd.cloud9.util.map.MapII;
 
+/**
+ * A representation for a document (aka. Image). This is different from "document" definition 
+ * of SLDA. The document here is equivalent to an Image
+ * 
+ * @author Khoa
+ *
+ */
 public class Document implements Writable, Cloneable, Serializable {
   /**
    * 
@@ -24,7 +29,8 @@ public class Document implements Writable, Cloneable, Serializable {
   /**
    * 
    */
-  private HMapII content = null;
+  private int[] content = null;
+  private HMapII termCount = null;
 
   /**
    * @deprecated
@@ -32,9 +38,9 @@ public class Document implements Writable, Cloneable, Serializable {
   private double[] gamma = null;
 
   /**
-   * Define the total number of words in this document, not necessarily distinct.
+   * Define the number of distinct words in this document
    */
-  private int numberOfWords = 0;
+  //private int numberOfWords = 0;
 
   /**
    * Creates a <code>LDADocument</code> object from a byte array.
@@ -64,14 +70,8 @@ public class Document implements Writable, Cloneable, Serializable {
   public Document() {
   }
 
-  public Document(HMapII document) {
-    this.content = document;
-    if (document != null) {
-      Iterator<Integer> itr = this.content.values().iterator();
-      while (itr.hasNext()) {
-        numberOfWords += itr.next();
-      }
-    }
+  public Document(int[] document) {
+    setDocument(document);
   }
 
   /**
@@ -79,7 +79,7 @@ public class Document implements Writable, Cloneable, Serializable {
    * @param document
    * @param gamma
    */
-  public Document(HMapII document, double[] gamma) {
+  public Document(int[] document, double[] gamma) {
     this(document);
     this.gamma = gamma;
   }
@@ -89,11 +89,11 @@ public class Document implements Writable, Cloneable, Serializable {
    * @param document
    * @param numberOfTopics
    */
-  public Document(HMapII document, int numberOfTopics) {
+  public Document(int[] document, int numberOfTopics) {
     this(document, new double[numberOfTopics]);
   }
 
-  public HMapII getContent() {
+  public int[] getContent() {
     return this.content;
   }
 
@@ -103,6 +103,10 @@ public class Document implements Writable, Cloneable, Serializable {
    */
   public double[] getGamma() {
     return gamma;
+  }
+  
+  public int getTermCount(int termID) {
+	  return termCount.get(termID);
   }
 
   /**
@@ -118,25 +122,12 @@ public class Document implements Writable, Cloneable, Serializable {
   }
 
   /**
-   * Get the total number of distinct types in this document.
-   * 
-   * @return the total number of unique types in this document.
-   */
-  public int getNumberOfTypes() {
-    if (content == null) {
-      return 0;
-    } else {
-      return content.size();
-    }
-  }
-
-  /**
    * Get the total number of words in this document, not necessarily distinct.
    * 
    * @return the total number of words in this document, not necessarily distinct.
    */
   public int getNumberOfWords() {
-    return numberOfWords;
+    return content.length;
   }
 
   /**
@@ -145,18 +136,13 @@ public class Document implements Writable, Cloneable, Serializable {
    * @param in source for raw byte representation
    */
   public void readFields(DataInput in) throws IOException {
-    numberOfWords = 0;
-
     int numEntries = in.readInt();
     if (numEntries <= 0) {
       content = null;
     } else {
-      content = new HMapII();
+      content = new int[numEntries];
       for (int i = 0; i < numEntries; i++) {
-        int id = in.readInt();
-        int count = in.readInt();
-        content.put(id, count);
-        numberOfWords += count;
+        content[i] = in.readInt();
       }
     }
 
@@ -185,15 +171,17 @@ public class Document implements Writable, Cloneable, Serializable {
     return bytesOut.toByteArray();
   }
 
-  public void setDocument(HMapII document) {
-    this.content = document;
-    numberOfWords = 0;
-
-    if (document != null) {
-      Iterator<Integer> itr = this.content.values().iterator();
-      while (itr.hasNext()) {
-        numberOfWords += itr.next();
-      }
+  public void setDocument(int[] document) {
+    content = document;
+    if(content != null) {
+    	termCount = new HMapII();
+    	for(int termID: this.content) {
+    		if(termCount.containsKey(termID)) {
+    			termCount.put(termID, termCount.get(termID) + 1);
+    		} else {
+    			termCount.put(termID, 1);
+    		}
+    	}
     }
   }
 
@@ -211,12 +199,10 @@ public class Document implements Writable, Cloneable, Serializable {
     if (content == null) {
       document.append("null");
     } else {
-      Iterator<Integer> itr = this.content.keySet().iterator();
-      while (itr.hasNext()) {
-        int id = itr.next();
-        document.append(id);
+      for(int i=0; i<content.length; i++) {
+        document.append(i);
         document.append(":");
-        document.append(content.get(id));
+        document.append(content[i]);
         document.append(" ");
       }
     }
@@ -243,10 +229,9 @@ public class Document implements Writable, Cloneable, Serializable {
     if (content == null) {
       out.writeInt(0);
     } else {
-      out.writeInt(content.size());
-      for (MapII.Entry e : content.entrySet()) {
-        out.writeInt(e.getKey());
-        out.writeInt(e.getValue());
+      out.writeInt(content.length);
+      for (int i=0; i<content.length; i++) {
+        out.writeInt(content[i]);
       }
     }
 

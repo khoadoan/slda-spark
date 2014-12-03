@@ -1,4 +1,4 @@
-package lda.hadoop.inference;
+package slda.hadoop.inference;
 
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.mapreduce.Partitioner;

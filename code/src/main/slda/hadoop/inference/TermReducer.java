@@ -1,12 +1,10 @@
-package lda.hadoop.inference;
+package slda.hadoop.inference;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-
-import lda.hadoop.inference.VariationalInference.ParameterCounter;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.filecache.DistributedCache;
@@ -18,6 +16,8 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
+
+import slda.hadoop.inference.VariationalInference.ParameterCounter;
 
 import com.google.common.base.Preconditions;
 
