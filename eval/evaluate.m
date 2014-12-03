@@ -1,3 +1,11 @@
+% suppose the image is MxN
+% data is a vector with length MxN 
+% truth is a vector with length MxN
+% each element of the vector is the label {0, 1, 2, ..., K}
+% if the element is 0, that means no label information
+% output ratio is the score (between 0 and 1, 1 is the best)
+% countp and countn is # of positive pairs and negative pairs
+
 function [ratio, countp, countn] = evaluate(data, truth)
 index = find(truth > 0);
 countp = 0;
